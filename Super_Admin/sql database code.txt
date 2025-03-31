@@ -1,0 +1,150 @@
+
+CREATE TABLE CustomerDistributor (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  companyName VARCHAR(255) NOT NULL,
+  mailId VARCHAR(255) NOT NULL,
+  contactNo VARCHAR(20) NOT NULL,
+  gstType ENUM('REGISTERED', 'UNREGISTERED') NOT NULL,
+  gstNo VARCHAR(50),
+  size ENUM('SMALL', 'MEDIUM', 'LARGE') NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  itAdmin VARCHAR(255) NOT NULL,
+  purchase VARCHAR(255) NOT NULL,
+  ownerName VARCHAR(255) NOT NULL,
+  mobileNo VARCHAR(20) NOT NULL,
+  image VARCHAR(255),
+  createdAt DATETIME DEFAULT NOW(),
+  updatedAt DATETIME ON UPDATE NOW()
+);
+
+
+CREATE TABLE Freelancer (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  mailId VARCHAR(255) NOT NULL,
+  expertise VARCHAR(255) NOT NULL,
+  mobileNo VARCHAR(20) NOT NULL,
+  documents TEXT NOT NULL,
+  photo VARCHAR(255),
+  experience INT NOT NULL,
+  createdAt DATETIME DEFAULT NOW(),
+  updatedAt DATETIME ON UPDATE NOW()
+);
+
+CREATE TABLE Employee (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  mailId VARCHAR(255) NOT NULL,
+  mobileNo VARCHAR(20) NOT NULL,
+  experience INT NOT NULL,
+  documents TEXT NOT NULL,
+  photo VARCHAR(255),
+  designation VARCHAR(255) NOT NULL,
+  createdAt DATETIME DEFAULT NOW(),
+  updatedAt DATETIME ON UPDATE NOW()
+);
+
+CREATE TABLE Product (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  oemId INT NOT NULL,
+  categoryId INT NOT NULL,
+  subcategories TEXT NOT NULL,
+  partNo VARCHAR(50) NOT NULL,
+  model VARCHAR(50) NOT NULL,
+  hsnNo VARCHAR(50) NOT NULL,
+  images TEXT NOT NULL,
+  description TEXT NOT NULL,
+  datasheet VARCHAR(255),
+  createdAt DATETIME DEFAULT NOW(),
+  updatedAt DATETIME ON UPDATE NOW(),
+  FOREIGN KEY (oemId) REFERENCES OEM(id),
+  FOREIGN KEY (categoryId) REFERENCES Category(id)
+);
+
+
+CREATE TABLE Category (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE OEM (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE User (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  passwordHash VARCHAR(255) NOT NULL,
+  role ENUM('SUPER_ADMIN', 'SUB_ADMIN', 'FREELANCER', 'DISTRIBUTOR', 'CUSTOMER') NOT NULL,
+  address VARCHAR(255),
+  mobileNo VARCHAR(20),
+  createdAt DATETIME DEFAULT NOW(),
+  updatedAt DATETIME ON UPDATE NOW()
+);
+
+
+CREATE TABLE `Order` (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  customerId INT NOT NULL,
+  status ENUM('PENDING', 'IN_PROCESS', 'SHIPPED', 'DELIVERED') NOT NULL,
+  totalPrice FLOAT NOT NULL,
+  createdAt DATETIME DEFAULT NOW(),
+  updatedAt DATETIME ON UPDATE NOW(),
+  FOREIGN KEY (customerId) REFERENCES User(id)
+);
+
+CREATE TABLE OrderItem (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  orderId INT NOT NULL,
+  productId INT NOT NULL,
+  quantity INT NOT NULL,
+  price FLOAT NOT NULL,
+  FOREIGN KEY (orderId) REFERENCES `Order`(id),
+  FOREIGN KEY (productId) REFERENCES Product(id)
+);
+
+
+CREATE TABLE Subscription (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  type ENUM('FREE', 'BASIC', 'GOLD', 'PREMIUM') NOT NULL,
+  price FLOAT NOT NULL,
+  maxSupportCalls INT NOT NULL,
+  rewards FLOAT NOT NULL,
+  userId INT NOT NULL,
+  createdAt DATETIME DEFAULT NOW(),
+  updatedAt DATETIME ON UPDATE NOW(),
+  FOREIGN KEY (userId) REFERENCES User(id)
+);
+
+
+CREATE TABLE Ticket (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  customerId INT NOT NULL,
+  freelancerId INT NOT NULL,
+  status ENUM('PENDING', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED') NOT NULL,
+  description TEXT NOT NULL,
+  createdAt DATETIME DEFAULT NOW(),
+  updatedAt DATETIME ON UPDATE NOW(),
+  FOREIGN KEY (customerId) REFERENCES User(id),
+  FOREIGN KEY (freelancerId) REFERENCES Freelancer(id)
+);
+
+
+CREATE TABLE Quotation (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  productId INT NOT NULL,
+  customerId INT NOT NULL,
+  priceOffered FLOAT NOT NULL,
+  status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL,
+  createdAt DATETIME DEFAULT NOW(),
+  updatedAt DATETIME ON UPDATE NOW(),
+  FOREIGN KEY (productId) REFERENCES Product(id),
+  FOREIGN KEY (customerId) REFERENCES User(id)
+);
